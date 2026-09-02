@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 import 'pages/feeds_sreen.dart';
 import 'pages/home_screen.dart';
@@ -47,17 +48,76 @@ class NavigationExample extends StatefulWidget {
 class _NavigationExampleState extends State<NavigationExample> {
   int currentPageIndex = 0;
 
+  List<Widget> pages = [
+    HomeScreen(),
+    FeedsScreen(),
+    MallScreen(),
+    TransactionsScreen(),
+    ProfileScreen(),
+  ];
+
+  bool _showNavigationBar = true;
+
+  void _handleScroll(ScrollNotification notification) {
+    if (notification is UserScrollNotification) {
+      if (notification.direction == ScrollDirection.reverse) {
+        // Scroll ke bawah
+        setState(() {
+          _showNavigationBar = false;
+        });
+      } else if (notification.direction == ScrollDirection.forward) {
+        // Scroll ke atas
+        setState(() {
+          _showNavigationBar = true;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: NavigationBar(
+      // bottomNavigationBar: _navBar(),
+      body: Stack(
+        children: [
+          NotificationListener<ScrollNotification>(
+            onNotification: (notification) {
+              _handleScroll(notification);
+              return false;
+            },
+            child: pages[currentPageIndex],
+          ),
+          AnimatedPositioned(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            left: 16,
+            right: 16,
+            bottom: _showNavigationBar ? 12 : -100,
+            child: _navBar(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _navBar() {
+    return Material(
+      elevation: 10,
+      borderRadius: BorderRadius.circular(25),
+      clipBehavior: Clip.antiAlias,
+      child: NavigationBar(
+        backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+        // ketika menu diklik
         onDestinationSelected: (int selectedMenu) {
           setState(() {
+            // ubah urutan menu dan halaman
             currentPageIndex = selectedMenu;
           });
         },
         indicatorColor: Theme.of(context).colorScheme.primary,
+        // menunjukkan menu mana yang aktif
         selectedIndex: currentPageIndex,
+        // kumpulan menu
         destinations: const <Widget>[
           // menu-menu di bawah
           NavigationDestination(
@@ -87,14 +147,6 @@ class _NavigationExampleState extends State<NavigationExample> {
           ),
         ],
       ),
-      body: <Widget>[
-        // halaman yang tampil
-        HomeScreen(),
-        FeedsScreen(),
-        MallScreen(),
-        TransactionsScreen(),
-        ProfileScreen(),
-      ][currentPageIndex],
     );
   }
 }
