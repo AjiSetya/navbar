@@ -56,17 +56,21 @@ class _NavigationExampleState extends State<NavigationExample> {
     ProfileScreen(),
   ];
 
+  // kondisi navbar muncul atau tidak
   bool _showNavigationBar = true;
 
+  // penentu kemunculan navbar
   void _handleScroll(ScrollNotification notification) {
     if (notification is UserScrollNotification) {
+      // jika scroll kebawah (layar ke atas)
       if (notification.direction == ScrollDirection.reverse) {
-        // Scroll ke bawah
+        // sembunyikan navbar
         setState(() {
           _showNavigationBar = false;
         });
       } else if (notification.direction == ScrollDirection.forward) {
-        // Scroll ke atas
+        // jika scroll keatas (layar ke bawah)
+        // tampilkan navbar
         setState(() {
           _showNavigationBar = true;
         });
@@ -77,25 +81,36 @@ class _NavigationExampleState extends State<NavigationExample> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // bottomNavigationBar: _navBar(),
-      body: Stack(
-        children: [
-          NotificationListener<ScrollNotification>(
-            onNotification: (notification) {
-              _handleScroll(notification);
-              return false;
-            },
-            child: pages[currentPageIndex],
-          ),
-          AnimatedPositioned(
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-            left: 16,
-            right: 16,
-            bottom: _showNavigationBar ? 12 : -100,
-            child: _navBar(),
-          ),
-        ],
+      body: NotificationListener<ScrollNotification>(
+        onNotification: (notification) {
+          _handleScroll(notification);
+          return false;
+        },
+        child: Stack(
+          children: [
+            pages[currentPageIndex],
+            Positioned(
+              left: 16,
+              right: 16,
+              bottom: 12,
+              child: AnimatedSlide(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOutCubic,
+                // Muncul: Offset(0, 0)
+                // Hilang: geser ke bawah
+                offset: _showNavigationBar ? Offset.zero : const Offset(0, 1.5),
+
+                child: AnimatedOpacity(
+                  duration: const Duration(milliseconds: 250),
+                  curve: Curves.easeInOut,
+                  opacity: _showNavigationBar ? 1.0 : 0.0,
+
+                  child: _navBar(),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -106,7 +121,6 @@ class _NavigationExampleState extends State<NavigationExample> {
       borderRadius: BorderRadius.circular(25),
       clipBehavior: Clip.antiAlias,
       child: NavigationBar(
-        backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
         // ketika menu diklik
         onDestinationSelected: (int selectedMenu) {
           setState(() {

@@ -122,6 +122,7 @@ class HomeScreen extends StatelessWidget {
       // BODY
       // =========================
       body: GridView.builder(
+        // padding: const EdgeInsets.only(bottom: 120),
         // padding: const EdgeInsets.only(bottom: 100),
         shrinkWrap: true,
         // physics: const NeverScrollableScrollPhysics(),
