@@ -3,8 +3,10 @@ import 'package:flutter/rendering.dart';
 
 import 'pages/feeds_sreen.dart';
 import 'pages/home_screen.dart';
+import 'pages/login_screen.dart';
 import 'pages/mall_sreen.dart';
 import 'pages/profile_screen.dart';
+import 'pages/register_screen.dart';
 import 'pages/transactions_screen.dart';
 
 /// Flutter code sample for [NavigationBar].
@@ -33,7 +35,15 @@ class NavigationBarApp extends StatelessWidget {
           brightness: Brightness.dark,
         ),
       ),
-      home: NavigationExample(),
+      // Halaman pertama yang dibuka
+      initialRoute: '/login',
+
+      // Daftar route
+      routes: {
+        '/login': (context) => const LoginPage(),
+        '/register': (context) => const RegisterPage(),
+        '/home': (context) => const NavigationExample(),
+      },
     );
   }
 }
