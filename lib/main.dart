@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:mysample/pages/kalkulator_screen.dart';
+import 'package:mysample/widgets/product_grid.dart';
 
 import 'pages/feeds_sreen.dart';
 import 'pages/home_screen.dart';
@@ -36,6 +38,8 @@ class NavigationBarApp extends StatelessWidget {
         ),
       ),
       // Halaman pertama yang dibuka
+      // home: NavigationExample(),
+      // route awal
       initialRoute: '/login',
 
       // Daftar route
@@ -63,6 +67,8 @@ class _NavigationExampleState extends State<NavigationExample> {
     FeedsScreen(),
     MallScreen(),
     TransactionsScreen(),
+    // ProductGrid(),
+    // KalkulatorScreen(),
     ProfileScreen(),
   ];
 
@@ -86,6 +92,112 @@ class _NavigationExampleState extends State<NavigationExample> {
         });
       }
     }
+  }
+
+  // penentu apakah dialog sudah muncul
+  bool dialogSudahMuncul = false;
+
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+    // jika dialog sudah muncul, tidak perlu menampilkan lagi
+    if (dialogSudahMuncul) return;
+
+    // ubah setatus dialog sudah muncul
+    dialogSudahMuncul = true;
+
+    // menbuat variabel arguments dari route
+    // arguments mengambil data dari halaman sebelumnya sebagai tipe data Map
+    final arguments =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    // memasukkan data ke variabel seusai key
+    final dataDiri = arguments?['data'];
+    final sesi = arguments?['sesi'];
+    final tanggal = arguments?['tanggal'];
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // jika data diri ada
+      if (dataDiri != null) {
+        // tampilkan dialog
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            title: Column(
+              children: [
+                Icon(Icons.waving_hand, size: 50, color: Colors.deepPurple),
+                const SizedBox(height: 10),
+                const Text('Selamat Datang!', textAlign: TextAlign.center),
+              ],
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  '${dataDiri['name']}',
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+
+                const SizedBox(height: 5),
+
+                const Text(
+                  'Senang melihat kamu kembali.',
+                  textAlign: TextAlign.center,
+                ),
+
+                const SizedBox(height: 20),
+
+                Container(
+                  padding: const EdgeInsets.all(15),
+                  decoration: BoxDecoration(
+                    color: Colors.deepPurple.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.calendar_today),
+                          const SizedBox(width: 10),
+                          Text('Tanggal: $tanggal'),
+                        ],
+                      ),
+
+                      const SizedBox(height: 10),
+
+                      Row(
+                        children: [
+                          const Icon(Icons.access_time),
+                          const SizedBox(width: 10),
+                          Text('Sesi: $sesi'),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Mulai'),
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+    });
   }
 
   @override

@@ -22,8 +22,23 @@ class LoginPage extends StatelessWidget {
 
             ElevatedButton(
               onPressed: () {
+                // membuat data diri
+                Map<String, dynamic> dataDiri = {
+                  'name': 'Aji Setya',
+                  'age': 20,
+                  'role': 'admin',
+                };
+
                 // menggantikan halaman login dengan halaman home
-                Navigator.pushReplacementNamed(context, '/home');
+                Navigator.pushReplacementNamed(
+                  context,
+                  '/home',
+                  arguments: {
+                    'data': dataDiri,
+                    'sesi': true,
+                    'tanggal': '2 Agustus 2023',
+                  },
+                );
               },
               child: const Text('Login'),
             ),

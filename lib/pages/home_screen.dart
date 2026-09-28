@@ -173,24 +173,6 @@ class HomeScreen extends StatelessWidget {
               builder: (context) => DetailProductScreen(product: product),
             ),
           );
-          // ketika di klik
-          // showDialog(
-          //   context: context,
-          //   builder: (context) {
-          //     return AlertDialog(
-          //       title: Text(product.name),
-          //       content: Text(product.name),
-          //       actions: [
-          //         TextButton(
-          //           child: Text('Close'),
-          //           onPressed: () {
-          //             Navigator.pop(context);
-          //           },
-          //         ),
-          //       ],
-          //     );
-          //   },
-          // );
         },
 
         child: Column(
