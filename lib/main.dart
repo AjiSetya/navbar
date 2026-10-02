@@ -9,7 +9,9 @@ import 'pages/login_screen.dart';
 import 'pages/mall_sreen.dart';
 import 'pages/profile_screen.dart';
 import 'pages/register_screen.dart';
+import 'pages/splash_screen.dart';
 import 'pages/transactions_screen.dart';
+import 'services/session_service.dart';
 
 /// Flutter code sample for [NavigationBar].
 
@@ -40,13 +42,14 @@ class NavigationBarApp extends StatelessWidget {
       // Halaman pertama yang dibuka
       // home: NavigationExample(),
       // route awal
-      initialRoute: '/login',
+      initialRoute: '/splash',
 
       // Daftar route
       routes: {
         '/login': (context) => const LoginPage(),
         '/register': (context) => const RegisterPage(),
         '/home': (context) => const NavigationExample(),
+        '/splash': (context) => const SplashScreen(),
       },
     );
   }
@@ -238,50 +241,138 @@ class _NavigationExampleState extends State<NavigationExample> {
   }
 
   Widget _navBar() {
-    return Material(
-      elevation: 10,
-      borderRadius: BorderRadius.circular(25),
-      clipBehavior: Clip.antiAlias,
-      child: NavigationBar(
-        // ketika menu diklik
-        onDestinationSelected: (int selectedMenu) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: BackdropFilter(
+          filterConfig: ImageFilterConfig.blur(
+            sigmaX: 10,
+            sigmaY: 10,
+          ), // Efek buram konten di belakang
+          child: Container(
+            height: 64,
+            decoration: BoxDecoration(
+              color: Colors.white, // Putih murni solid (bukan transparan)
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: Colors.grey.shade300, // Border pemisah yang jelas
+                width: 1.2,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.15), // Shadow lebih dalam
+                  blurRadius: 20,
+                  spreadRadius: 1,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildNavItem(
+                  index: 0,
+                  icon: Icons.home_outlined,
+                  activeIcon: Icons.home_rounded,
+                  label: 'Home',
+                ),
+                _buildNavItem(
+                  index: 1,
+                  icon: Icons.video_collection_outlined,
+                  activeIcon: Icons.video_collection_rounded,
+                  label: 'Feeds',
+                ),
+                _buildNavItem(
+                  index: 2,
+                  icon: Icons.store_outlined,
+                  activeIcon: Icons.store_rounded,
+                  label: 'Mall',
+                ),
+                _buildNavItem(
+                  index: 3,
+                  icon: Icons.receipt_long_outlined,
+                  activeIcon: Icons.receipt_long_rounded,
+                  label: 'Orders',
+                  badgeCount: 2,
+                ),
+                _buildNavItem(
+                  index: 4,
+                  icon: Icons.person_outlined,
+                  activeIcon: Icons.person_rounded,
+                  label: 'Profile',
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavItem({
+    required int index,
+    required IconData icon,
+    required IconData activeIcon,
+    required String label,
+    int? badgeCount,
+  }) {
+    final isSelected = currentPageIndex == index;
+    final primaryColor = Theme.of(context).colorScheme.primary;
+
+    Widget iconWidget = Icon(
+      isSelected ? activeIcon : icon,
+      size: 20,
+      color: isSelected ? Colors.white : Colors.grey.shade700,
+    );
+
+    // Jika ada badge
+    if (badgeCount != null && badgeCount > 0) {
+      iconWidget = Badge(
+        label: Text(
+          '$badgeCount',
+          style: const TextStyle(fontSize: 9, color: Colors.white),
+        ),
+        child: iconWidget,
+      );
+    }
+
+    return Expanded(
+      child: InkWell(
+        onTap: () {
           setState(() {
-            // ubah urutan menu dan halaman
-            currentPageIndex = selectedMenu;
+            currentPageIndex = index;
           });
         },
-        indicatorColor: Theme.of(context).colorScheme.primary,
-        // menunjukkan menu mana yang aktif
-        selectedIndex: currentPageIndex,
-        // kumpulan menu
-        destinations: const <Widget>[
-          // menu-menu di bawah
-          NavigationDestination(
-            selectedIcon: Icon(Icons.home, color: Colors.white),
-            icon: Icon(Icons.home_outlined),
-            label: 'Home',
-          ),
-          NavigationDestination(
-            selectedIcon: Icon(Icons.video_collection, color: Colors.white),
-            icon: Icon(Icons.video_collection_outlined),
-            label: 'Feeds',
-          ),
-          NavigationDestination(
-            selectedIcon: Icon(Icons.store, color: Colors.white),
-            icon: Icon(Icons.store_outlined),
-            label: 'Mall',
-          ),
-          NavigationDestination(
-            selectedIcon: Icon(Icons.list_alt, color: Colors.white),
-            icon: Badge(label: Text('2'), child: Icon(Icons.list_alt_outlined)),
-            label: 'Transactions',
-          ),
-          NavigationDestination(
-            selectedIcon: Icon(Icons.person, color: Colors.white),
-            icon: Icon(Icons.person_outlined),
-            label: 'Profile',
-          ),
-        ],
+        borderRadius: BorderRadius.circular(20),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Indikator Kapsul Aktif
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
+              decoration: BoxDecoration(
+                color: isSelected ? primaryColor : Colors.transparent,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: iconWidget,
+            ),
+            const SizedBox(height: 2),
+            // Label Teks
+            Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                color: isSelected ? primaryColor : Colors.grey.shade700,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

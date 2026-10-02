@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:mysample/data/dummy/dummy_transaksi.dart';
+import 'package:mysample/pages/chat_screen.dart';
+import 'package:mysample/pages/transaksi_detail_screen.dart';
+import 'package:mysample/pages/transaksi_lacak_screen.dart';
+import 'package:mysample/pages/transaksi_nilai_screen.dart';
 import 'package:mysample/widgets/my_app_bar.dart';
 
 class TransactionsScreen extends StatelessWidget {
-  TransactionsScreen({super.key});
+  const TransactionsScreen({super.key});
 
   String formatRupiah(int harga) {
     return 'Rp ${harga.toString().replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+(?!\d))'), (match) => '${match.group(1)}.')}';
@@ -24,6 +28,85 @@ class TransactionsScreen extends StatelessWidget {
       default:
         return Colors.grey;
     }
+  }
+
+  String getButtonText(String status) {
+    switch (status) {
+      case 'Selesai':
+        return 'Nilai';
+      case 'Dikirim':
+        return 'Lacak';
+      case 'Dikemas':
+        return 'Tanya Penjual';
+      case 'Diproses':
+        return 'Tanya Penjual';
+      case 'Dibatalkan':
+        return 'Beli Lagi';
+      default:
+        return 'Detail';
+    }
+  }
+
+  void handleButton(String status, BuildContext context) {
+    switch (status) {
+      case 'Selesai':
+        nilaiProduk(context);
+        break;
+      case 'Dikirim':
+        lacakPesanan(context);
+        break;
+      case 'Diproses':
+        tanyaPenjual(context);
+        break;
+      case 'Dikemas':
+        tanyaPenjual(context);
+        break;
+      case 'Dibatalkan':
+        pindahDetailTransaksi(context);
+        break;
+      default:
+        pindahDetailTransaksi(context);
+    }
+  }
+
+  void nilaiProduk(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        // pindah ke halaman detail dengan mengirimkan produk
+        builder: (context) => NilaiProdukScreen(),
+      ),
+    );
+  }
+
+  void lacakPesanan(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        // pindah ke halaman detail dengan mengirimkan produk
+        builder: (context) => LacakTransaksiScreen(),
+      ),
+    );
+  }
+
+  void tanyaPenjual(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        // pindah ke halaman detail dengan mengirimkan produk
+        builder: (context) => ChatScreen(),
+      ),
+    );
+  }
+
+  void pindahDetailTransaksi(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        // pindah ke halaman detail dengan mengirimkan produk
+        builder: (context) => DetailTransaksiScreen(),
+      ),
+    );
   }
 
   @override
@@ -170,7 +253,9 @@ class TransactionsScreen extends StatelessWidget {
                         ],
                       ),
                       OutlinedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          handleButton(item.status, context);
+                        },
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 20,
@@ -179,12 +264,10 @@ class TransactionsScreen extends StatelessWidget {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          side: BorderSide(
-                            color: Theme.of(context).primaryColor,
-                          ),
+                          side: BorderSide(color: getStatusColor(item.status)),
                         ),
                         child: Text(
-                          item.status == 'Dikirim' ? 'Lacak' : 'Detail',
+                          getButtonText(item.status),
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,

@@ -123,7 +123,7 @@ class HomeScreen extends StatelessWidget {
               SizedBox(height: 12),
               GridView.builder(
                 shrinkWrap: true,
-                // physics: const NeverScrollableScrollPhysics(),
+                physics: const NeverScrollableScrollPhysics(),
                 // menentukan jumlah item
                 itemCount: products.length,
 
@@ -135,7 +135,7 @@ class HomeScreen extends StatelessWidget {
                   // menentukan jarak atas dan bawah
                   mainAxisSpacing: 12,
                   // menentukan rasio antar item
-                  // childAspectRatio: 0.68,
+                  childAspectRatio: 0.72,
                 ),
 
                 // untuk membuat konten tiam item
@@ -158,76 +158,148 @@ class HomeScreen extends StatelessWidget {
   // memiliki parameter product untuk menampung produk
   // =========================
   Widget _productItemView(Product product, BuildContext context) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      clipBehavior: Clip.antiAlias,
-
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              // pindah ke halaman detail dengan mengirimkan produk
-              builder: (context) => DetailProductScreen(product: product),
-            ),
-          );
-        },
-
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Gambar produk
-            Expanded(
-              child: Image.network(
-                product.image,
-                width: double.infinity,
-                fit: BoxFit.cover,
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DetailProductScreen(product: product),
               ),
-            ),
-
-            // Informasi produk
-            Padding(
-              padding: const EdgeInsets.all(10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    product.name,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
+            );
+          },
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 1. Gambar Produk dengan AspectRatio Tetap (1:1 / Persegi)
+              AspectRatio(
+                aspectRatio:
+                    1.2, // Mengatur porsi rasio gambar agar tidak terpotong ekstrim
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(16),
+                  ),
+                  child: Container(
+                    color: const Color(
+                      0xFFF8FAFC,
+                    ), // Neutral background untuk gambar PNG
+                    child: Image.network(
+                      product.image,
+                      width: double.infinity,
+                      fit: BoxFit
+                          .contain, // BoxFit.contain agar produk utuh terlihat, atau BoxFit.cover jika gambar penuh
+                      errorBuilder: (context, error, stackTrace) =>
+                          const Center(
+                            child: Icon(
+                              Icons.broken_image_outlined,
+                              color: Colors.grey,
+                            ),
+                          ),
                     ),
                   ),
+                ),
+              ),
 
-                  const SizedBox(height: 6),
-
-                  Text(
-                    'Rp ${product.price}',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
+              // 2. Informasi Produk yang Proporsional
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 8,
                   ),
-
-                  const SizedBox(height: 6),
-
-                  const Row(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment
+                        .spaceBetween, // Menjaga elemen terbagi rata
                     children: [
-                      Icon(Icons.star, size: 16, color: Colors.orange),
-                      SizedBox(width: 4),
-                      Text('4.8'),
+                      // Nama Produk
+                      Text(
+                        product.name,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 13, // Diperkecil agar lebih rapi
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey.shade800,
+                          height: 1.2,
+                        ),
+                      ),
+
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Harga Produk
+                          Text(
+                            'Rp ${_formatPrice(product.price)}',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              color: Theme.of(context).primaryColor,
+                            ),
+                          ),
+
+                          const SizedBox(height: 4),
+
+                          // Rating & Penjualan (Opsional)
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.star_rounded,
+                                size: 14,
+                                color: Colors.amber,
+                              ),
+                              const SizedBox(width: 2),
+                              Text(
+                                '4.8',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey.shade700,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                '| 100+ terjual',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  color: Colors.grey.shade500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ],
                   ),
-                ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
+    );
+  }
+
+  // Helper untuk format titik harga (contoh: 250000 -> 250.000)
+  String _formatPrice(dynamic price) {
+    final numPrice = num.tryParse(price.toString()) ?? 0;
+    return numPrice.toString().replaceAllMapped(
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (Match m) => '${m[1]}.',
     );
   }
 }
