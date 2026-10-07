@@ -3,6 +3,7 @@ import 'package:flutter/rendering.dart';
 import 'package:mysample/pages/kalkulator_screen.dart';
 import 'package:mysample/widgets/product_grid.dart';
 
+import 'pages/cart_screen.dart';
 import 'pages/feeds_sreen.dart';
 import 'pages/home_screen.dart';
 import 'pages/login_screen.dart';
@@ -50,6 +51,7 @@ class NavigationBarApp extends StatelessWidget {
         '/register': (context) => const RegisterPage(),
         '/home': (context) => const NavigationExample(),
         '/splash': (context) => const SplashScreen(),
+        '/cart': (context) => const CartPage(),
       },
     );
   }

@@ -40,7 +40,9 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
 
           // Tombol Keranjang
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.pushNamed(context, '/cart');
+            },
             icon: const Icon(Icons.shopping_cart_outlined),
           ),
         ],
